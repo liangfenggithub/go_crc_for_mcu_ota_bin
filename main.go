@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"hash/crc32"
 	"io"
@@ -8,7 +9,6 @@ import (
 	"time"
 )
 
-var file_name string = "./bapp.bin"
 var read_cnt int = 0
 
 func getNowTimeStr() string {
@@ -20,21 +20,28 @@ func getNowTimeStr() string {
 
 func main() {
 
-	// 获取命令行参数
-	if len(os.Args) < 2 { //判断命令行参数数量
-		fmt.Println("please input ota file path")
-		return
-	}
-	//遍历显示命令行参数
-	// for k, v := range os.Args {
-	// 	fmt.Printf("args[%v]=[%v]\n", k, v)
-	// }
+	/*
+	   定义变量接收控制台参数
+	*/
 
-	file_name = os.Args[1]
-	fmt.Printf("ota file path is %v\n", file_name)
+	//源mcu固件路径
+	var source_file_path string
+
+	//目标固件路径
+	var target_file_path string
+
+	// StringVar用指定的名称、控制台参数项目、默认值、使用信息注册一个string类型flag，并将flag的值保存到p指向的变量
+	flag.StringVar(&source_file_path, "s", "", "源mcu固件路径 如./uapp.bin")
+	flag.StringVar(&target_file_path, "o", "", "目标固件路径 如 ./crc_out.bin")
+
+	// 从arguments中解析注册的flag。必须在所有flag都注册好而未访问其值时执行。未注册却使用flag -help时，会返回ErrHelp。
+	flag.Parse()
+
+	// 打印
+	fmt.Printf("source_file_path=%v target_file_path=%v \n", source_file_path, target_file_path)
 
 	//判断文件是否存在
-	stat, err := os.Stat(file_name)
+	stat, err := os.Stat(source_file_path)
 	if err != nil {
 		fmt.Print(err)
 		return
@@ -42,7 +49,7 @@ func main() {
 	fmt.Printf("bin file size is %v byte\n", stat.Size())
 
 	// 打开读取的文件
-	file, err := os.Open(file_name)
+	file, err := os.Open(source_file_path)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -89,7 +96,13 @@ func main() {
 	crcBuff[3] = byte(crcRes >> 24)
 
 	//写入新文件
-	newFileName := fmt.Sprintf("%x_%s.bin", crcRes, getNowTimeStr())
+	var newFileName string
+	if target_file_path == "" {
+
+		newFileName = fmt.Sprintf("%x_%s.bin", crcRes, getNowTimeStr())
+	} else {
+		newFileName = target_file_path
+	}
 	fmt.Printf("new file name :%s\n", newFileName)
 
 	file_new, err := os.Create(newFileName)
