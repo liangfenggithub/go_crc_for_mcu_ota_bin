@@ -8,7 +8,7 @@
 
 ## 编译命令
 ```bash
-go build ./main.go
+go build -o crc_make.exe ./main.go
 ```
 
 ## 使用方式
