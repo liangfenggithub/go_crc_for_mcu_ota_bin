@@ -9,6 +9,8 @@ import (
 )
 
 var file_name string = "./bapp.bin"
+var output_file_name string = "./output.bin"
+
 var read_cnt int = 0
 
 func getNowTimeStr() string {
@@ -20,18 +22,22 @@ func getNowTimeStr() string {
 
 func main() {
 
+	fmt.Println("crc make tool bylf")
+
 	// 获取命令行参数
-	if len(os.Args) < 2 { //判断命令行参数数量
-		fmt.Println("please input ota file path")
+	if len(os.Args) < 3 { //判断命令行参数数量
+		fmt.Println("please input ota file path and output path")
 		return
 	}
 	//遍历显示命令行参数
-	// for k, v := range os.Args {
-	// 	fmt.Printf("args[%v]=[%v]\n", k, v)
-	// }
+	for k, v := range os.Args {
+		fmt.Printf("args[%v]=[%v]\n", k, v)
+	}
 
 	file_name = os.Args[1]
-	fmt.Printf("ota file path is %v\n", file_name)
+	fmt.Printf("ota input file path is %v\n", file_name)
+	output_file_name = os.Args[2]
+	fmt.Printf("ota output path is %v\n", file_name)
 
 	//判断文件是否存在
 	stat, err := os.Stat(file_name)
@@ -39,7 +45,7 @@ func main() {
 		fmt.Print(err)
 		return
 	}
-	fmt.Printf("bin file size is %v byte\n", stat.Size())
+	fmt.Printf("input bin file size is %v byte\n", stat.Size())
 
 	// 打开读取的文件
 	file, err := os.Open(file_name)
@@ -89,7 +95,7 @@ func main() {
 	crcBuff[3] = byte(crcRes >> 24)
 
 	//写入新文件
-	newFileName := fmt.Sprintf("%x_%s.bin", crcRes, getNowTimeStr())
+	newFileName := fmt.Sprintf("%s\\%x_%s.bin", output_file_name, crcRes, getNowTimeStr())
 	fmt.Printf("new file name :%s\n", newFileName)
 
 	file_new, err := os.Create(newFileName)

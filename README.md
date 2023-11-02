@@ -4,7 +4,7 @@
 ## 分支描述
 * main: 最简单实现
 * flag: 使用flag库解析命令行参数
-
+* watch 为手环工程生成固件，支持指定输出文件路径
 
 ## 编译命令
 ```bash
@@ -13,6 +13,6 @@ go build ./main.go
 
 ## 使用方式
 ```bash
-./main.exe `待操作的bin文件的path`
+./main.exe `待操作的bin文件的path` `要输出的目标path（不包含文件名）`
 ```
 
